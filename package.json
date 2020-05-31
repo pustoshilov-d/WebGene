@@ -1,23 +1,33 @@
 {
   "name": "web-gene",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "bootstrap": "^4.5.0",
+    "fibers": "^5.0.0",
+    "jquery": "^3.5.1",
+    "node-sass": "^4.14.1",
+    "popper.js": "^1.16.1",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
     "react-router": "^5.2.0",
-    "react-scripts": "3.4.1"
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.1",
+    "react-sticky": "^6.0.3",
+    "sass": "^1.26.7",
+    "typescript": "^3.9.3"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm audit fix && react-scripts build && npm install -g serve -s build -l 8080",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "gcp-build": "npm run build",
+    "deploy": "gcloud app deploy app.yaml --version=0-1-2"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -33,5 +43,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "engines": {
+    "node": "12.x",
+    "npm": "6.x"
   }
 }
