@@ -223,8 +223,8 @@ header {
 }
 
 .home-block-image-mine{
-  /*height: 100%;*/
-  width: 160%;
+  width: 49.3vh;
+  /*height: 65vh;*/
   position: relative;
   right: 80%;
   z-index: 100;
@@ -232,8 +232,8 @@ header {
 }
 
 .home-block-image-dna{
-  /*height: 100%;*/
-  width: 149%;
+  width: 46.1vh;
+  /*height: 65vh;*/
   position: relative;
   left: 30%;
   z-index: 100;
@@ -269,16 +269,20 @@ header {
   vertical-align: middle;
 }
 
+.data-button:hover {
+  color: #440BD4 !important;
+  border: #440BD4 !important;
+}
+
+.link-without-underline{
+  text-decoration: none !important;
+}
+
 .image-button-small{
   width: 44px;
   height: 44px;
   vertical-align: middle;
   margin: 15px 15px 15px 15px;
-}
-
-.data-button:hover{
-  color: #440BD4 !important;
-  border: #440BD4 !important;
 }
 
 .container-padding-top{
@@ -307,6 +311,9 @@ header {
   background-color: #440BD4 !important;
 }
 
+.home-block-wrapper{
+  display: inline-block !important;
+}
 
 
 

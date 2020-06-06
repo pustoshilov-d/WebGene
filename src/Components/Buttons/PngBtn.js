@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import icon from "../../images/Buttons/PngButton.png";
+import iconActive from "../../images/Buttons/Png-Active.png";
 
 class PngBtn extends Component {
     render() {
@@ -10,6 +11,8 @@ class PngBtn extends Component {
                         className={"image-button"}
                         src={icon}
                         alt={"PNG download button"}
+                        onMouseOver={e => (e.currentTarget.src =  iconActive)}
+                        onMouseOut={e => (e.currentTarget.src = icon)}
                     />
                 </a>
             </div>

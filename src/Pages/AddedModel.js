@@ -103,7 +103,7 @@ class AddedModel extends Component {
 
         return (
             <div className={"bg-sub"}>
-                <h1>{this.state.dataId}</h1>
+                {/*<h1>{this.state.dataId}</h1>*/}
                 <Container fluid className={"container-padding-top"}>
                     <Row>
                         <Col sm={6} className={"text-color-sub"}>

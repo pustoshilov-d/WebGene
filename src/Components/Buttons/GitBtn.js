@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import icon from "../../images/Buttons/GitButton.png";
 import {Link} from "react-router-dom";
+import iconActive from "../../images/Buttons/Git-Active.png";
 
 class GitBtn extends Component {
     render() {
@@ -11,6 +12,8 @@ class GitBtn extends Component {
                         className={"image-button"}
                         src={icon}
                         alt={"Git button"}
+                        onMouseOver={e => (e.currentTarget.src =  iconActive)}
+                        onMouseOut={e => (e.currentTarget.src = icon)}
                     />
                 </a>
             </div>

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import icon from "../../images/Buttons/SvgButton.png";
+import iconActive from "../../images/Buttons/Svg-Active.png";
 
 class SvgBtn extends Component {
     render() {
@@ -10,6 +11,8 @@ class SvgBtn extends Component {
                         className={"image-button"}
                         src={icon}
                         alt={"SVG download button"}
+                        onMouseOver={e => (e.currentTarget.src =  iconActive)}
+                        onMouseOut={e => (e.currentTarget.src = icon)}
                     />
                 </a>
             </div>

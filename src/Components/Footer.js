@@ -8,7 +8,7 @@ class Footer extends Component {
             // <div className="footer align-vert-middle">
             <div className="fixed-bottom footer align-vert-middle">
                     <Container fluid>
-                            <Row>
+                            <Row style={{paddingTop : "15px"}}>
                                 <Col sm={10} className={"text-color-sub text-small footer-text"}>
                                     <p>
                                         For correct operation, we recommend using Google Chrome

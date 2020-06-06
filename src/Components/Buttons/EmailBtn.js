@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import icon from "../../images/Buttons/EmailButton.png";
+import iconActive from "../../images/Buttons/Email-Active.png";
 import {Link} from "react-router-dom";
 
 class EmailBtn extends Component {
+
     render() {
         return (
             <div >
@@ -11,6 +13,8 @@ class EmailBtn extends Component {
                         className={"image-button"}
                         src={icon}
                         alt={"Email button"}
+                        onMouseOver={e => (e.currentTarget.src =  iconActive)}
+                        onMouseOut={e => (e.currentTarget.src = icon)}
                     />
                 </a>
             </div>

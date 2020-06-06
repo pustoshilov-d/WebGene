@@ -1,0 +1,6 @@
+  psql "sslmode=verify-ca sslrootcert=server-ca.pem \
+      sslcert=client-cert.pem sslkey=client-key.pem \
+      hostaddr=34.107.16.127 \
+      port=5432 \
+      user=user_client dbname=users-data"
+      WhatTheFuckAreYouDoingMan1

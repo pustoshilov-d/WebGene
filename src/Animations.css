@@ -1,0 +1,57 @@
+.opacity-enter {
+    opacity: 0;
+}
+.opacity-enter-active {
+    opacity: 1;
+    transition: opacity 3000ms;
+}
+.opacity-exit {
+    opacity: 1;
+}
+.opacity-exit-active  {
+    opacity: 0;
+    transition: opacity 3000ms;
+}
+
+/*.shadow-enter{*/
+/*    filter: drop-shadow(0px 0px 0px #000000)*/
+/*}*/
+/*.shadow-enter-active{*/
+/*    filter: drop-shadow(40px 0px 10px #000000);*/
+/*    transition: drop-shadow 1000ms;*/
+/*}*/
+/*.shadow-exit {*/
+/*    filter: drop-shadow(40px 0px 10px #000000)*/
+/*}*/
+/*.shadow-exit-active{*/
+/*    filter: drop-shadow(0px 0px 0px #000000);*/
+/*    transition: drop-shadow 1000ms;*/
+/*}*/
+
+
+
+
+
+
+
+.dialog-enter {
+    opacity: 0.01;
+    transform: scale(1.1);
+}
+
+.dialog-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 300ms;
+}
+
+.dialog-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.dialog-exit-active {
+    opacity: 0.01;
+    transform: scale(1.1);
+    transition: all 300ms;
+}
