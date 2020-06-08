@@ -36,12 +36,15 @@ class Loading extends Component {
             author_name:form.elements["validationUsername"].value,
             author_email:form.elements["validationEmail"].value,
             data_file:form.elements["formcheck-api-regular"].files[0],
-            terms_acceptation: form.elements["validationTerms"].value,
         })
+        form.elements["validationTerms"].value === "on" ?
+            await this.setState({terms_acceptation: true}) :
+            await this.setState({terms_acceptation: false})
         
         console.log(this.state);
         let result = await this.upload()
-        this.props.history.push("/models/"+result.data.id.toString())
+        console.log(result)
+        // this.props.history.push("/models/"+result.data.id.toString())
     }
 
     upload = async (id) => {
