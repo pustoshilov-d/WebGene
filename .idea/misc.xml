@@ -3,4 +3,5 @@
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="JSX" />
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Pipenv (server)" project-jdk-type="Python SDK" />
 </project>

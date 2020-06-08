@@ -19,7 +19,7 @@ class ModelsCarousel extends Component {
                         {this.props.info.map((data,i) =>
                             <Col sm={2}>
                                 <Link to={"/models/"+data.id} className={"link-without-underline"}>
-                                    <DataBtn label={data.label} author={data.author}/>
+                                    <DataBtn label={data.data_label} author={data.author_name}/>
                                 </Link>
                             </Col>
                         )}

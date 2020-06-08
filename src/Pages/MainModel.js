@@ -8,6 +8,8 @@ import SvgBtn from "../Components/Buttons/SvgBtn";
 import PngBtn from "../Components/Buttons/PngBtn";
 import EmailBtn from "../Components/Buttons/EmailBtn";
 import DownArrow from "../Components/Buttons/DownArrow";
+import LoadingModelBar from "../Components/LoadingModelBar";
+const axios = require('axios').default;
 
 class MainModel extends Component {
 
@@ -15,10 +17,11 @@ class MainModel extends Component {
         super(props)
 
         this.state = {
-            dataLabel: null,
-            authorName: null,
-            authorEmail: null,
-            dataDescription: null,
+            id: 0,
+            data_label: null,
+            author_name: null,
+            author_email: null,
+            data_description: null,
             image: null,
 
             tableData: {
@@ -30,49 +33,50 @@ class MainModel extends Component {
             svgLink: null,
             pngLink: null,
 
-            modelsInfo: [
+            carouselInfo: [
                 {id: null, label: null, author: null, link:"/"}],
         }
 
-        this.getDataForCarousel = this.getDataForCarousel.bind(this)
-        this.getCurrentPageData = this.getCurrentPageData.bind(this)
+        this.getInfoFromServer = this.getInfoFromServer.bind(this)
    };
 
     componentDidMount =  () => {
-        this.getCurrentPageData();
-        this.getDataForCarousel();
+        this.getInfoFromServer(this.state.id)
     }
 
-    getDataForCarousel = () => {
-        this.setState({
-            modelsInfo: [
-                {id: 1, label: "RNA sequence", author: "Vasily"},
-                {id: 2, label: "E-coli RNA", author: "Dimitry"},
-                {id: 3, label: "E-coli DNA", author: "Kristy"},
-                {id: 4, label: "Human DNA", author: "Victor"}]
-        })
-    }
+     getInfoFromServer = async (id) => {
+         console.log(this.state)
+         const link = "https://europe-west3-webgene.cloudfunctions.net/getUserInfo"
+         let result = await axios({
+             url: link,
+             method: 'post',
+             headers: {
+                 'Content-Type': 'application/json',
+             },
+             data: JSON.stringify({id: id})
+         })
+         console.log(result)
+         result = result.data
+         console.log(result)
 
-    getCurrentPageData = () => {
-        this.setState( {
-            dataLabel: "Human RNA",
-            authorName: "Pustoshilov",
-            authorEmail: "pustoshilov.d@gmail.com",
-            dataDescription: "Even if we, when we were just born, lived already one in the river Upe," +
-                " under the dam, and the other in Gavlovitsy - you know, there, near the wooden bridge.",
+         await this.setState(result.pageInfo)
+         await this.setState({carouselInfo: result.carouselInfo})
+         console.log(this.state)
 
-            image: plotImage,
+         await this.setState( {
+             image: plotImage,
+             tableData: {
+                 r0: {c0: "#", c1: "First Name", c2: "Last Name", c3: "Username"},
+                 r1: {c0: "1", c1: "Mark", c2: "Thornton", c3: "@mdo"},
+                 r2: {c0: "2", c1: "Jacob", c2: "Otto", c3: "@fat"},
+                 r3: {c0: "3", c1: "Larry", c2: "the Bird", c3: "@twitter"},
+             },
+             svgLink: "http://htmlbook.ru/themes/hb/img/logo.png",
+             pngLink: "http://htmlbook.ru/themes/hb/img/logo.png",
+         })
 
-            tableData: {
-                r0: {c0: "#", c1: "First Name", c2: "Last Name", c3: "Username"},
-                r1: {c0: "1", c1: "Mark", c2: "Thornton", c3: "@mdo"},
-                r2: {c0: "2", c1: "Jacob", c2: "Otto", c3: "@fat"},
-                r3: {c0: "3", c1: "Larry", c2: "the Bird", c3: "@twitter"},
-            },
-            svgLink: "http://htmlbook.ru/themes/hb/img/logo.png",
-            pngLink: "http://htmlbook.ru/themes/hb/img/logo.png",
-        })
-    }
+         console.log(this.state)
+     }
 
 
 
@@ -83,18 +87,18 @@ class MainModel extends Component {
                     <Row>
                         <Col sm={6} className={"text-color-sub"}>
                             <p className={"text-header"}>
-                                {this.state.dataLabel}
+                                {this.state.data_label}
                             </p>
                             <p className={"text-main text-color-sub"}>
-                                <b>Author name:</b> {this.state.authorName}
+                                <b>Author name:</b> {this.state.author_name}
                             </p>
                             <p className={"text-main text-color-sub"}>
-                                <b>Author email:</b> {this.state.authorEmail}
+                                <b>Author email:</b> {this.state.author_email}
                             </p>
 
                             <p className={"text-main text-color-sub"}>
                                 <b>Description:</b>
-                                <br/>{this.state.dataDescription}
+                                <br/>{this.state.data_description}
                             </p>
 
                             <TableSample data={this.state.tableData}/>
@@ -102,7 +106,10 @@ class MainModel extends Component {
 
                         <Col sm={1}/>
                         <Col sm={5}>
-                            <Plot source={this.state.image}/>
+                            {this.state.data_processed
+                                ? <Plot source={this.state.image}/>
+                                : <LoadingModelBar calculated_time={this.state.calculated_time} progress={this.state.progress}/>
+                            }
                         </Col>
                     </Row>
 
@@ -116,7 +123,7 @@ class MainModel extends Component {
                         </Col>
 
                         <Col sm={1}>
-                            <EmailBtn email={this.state.authorEmail}/>
+                            <EmailBtn email={this.state.author_email}/>
                         </Col>
                     </Row>
                 </Container>
@@ -124,7 +131,7 @@ class MainModel extends Component {
 
                 <div style={{height:"500px"}} className={"bg-models"}>
                     <DownArrow/>
-                    <ModelsCarousel info={this.state.modelsInfo}/>
+                    <ModelsCarousel info={this.state.carouselInfo}/>
                 </div>
 
 

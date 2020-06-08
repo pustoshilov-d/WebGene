@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {Button, Col, Container, Form, InputGroup, Row} from "react-bootstrap";
 import UploadBtn from "../Components/Buttons/UploadBtn";
-import {withRouter} from 'react-router-dom'
+import {withRouter} from 'react-router-dom';
+const axios = require('axios').default;
 
 
 class Loading extends Component {
@@ -10,12 +11,12 @@ class Loading extends Component {
         super(props)
 
         this.state = {
-            dataLabel:null,
-            dataDescription:null,
-            authorName:null,
-            authorEmail:null,
-            dataFile:null,
-            termsAgreement: false,
+            data_label:null,
+            data_description:null,
+            author_name:null,
+            author_email:null,
+            data_file:null,
+            terms_acceptation: false,
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -23,56 +24,37 @@ class Loading extends Component {
     };
 
 
-    handleSubmit = (event) => {
+    handleSubmit = async (event) => {
         const form = event.currentTarget;
         event.preventDefault();
         console.log(event)
         console.log(form.elements)
 
-        this.setState({
-            dataLabel:form.elements["validationLabel"].value,
-            dataDescription:form.elements["validationDescription"].value,
-            authorName:form.elements["validationUsername"].value,
-            authorEmail:form.elements["validationEmail"].value,
-            dataFile:form.elements["formcheck-api-regular"].files[0],
-            termsAgreement: form.elements["validationTerms"].value,
-        },  () =>{
-            console.log(this.state);
-
-            // this.upload()
-            this.setState({
-                newModelId: 10
-            }, () =>{
-                this.props.history.push("/models/"+this.state.newModelId)
-            })
-
-
-
+        await this.setState({
+            data_label:form.elements["validationLabel"].value,
+            data_description:form.elements["validationDescription"].value,
+            author_name:form.elements["validationUsername"].value,
+            author_email:form.elements["validationEmail"].value,
+            data_file:form.elements["formcheck-api-regular"].files[0],
+            terms_acceptation: form.elements["validationTerms"].value,
         })
+        
+        console.log(this.state);
+        let result = await this.upload()
+        this.props.history.push("/models/"+result.data.id.toString())
+    }
 
-    };
-
-    upload = () => {
-        //with success return newModelId
-        this.setState({
-            newModelId: 10
-        })
-        fetch('http://www.example.net', { // Your POST endpoint
-            method: 'POST',
+    upload = async (id) => {
+        const link = "https://europe-west3-webgene.cloudfunctions.net/postUserData"
+        return axios({
+            url: link,
+            method: 'post',
             headers: {
-                // Content-Type may need to be completely **omitted**
-                // or you may need something
-                "Content-Type": "You will perhaps need to define a content-type here"
+                'Content-Type': 'application/json',
             },
-            body: this.state // This is your file object
-        }).then(
-            response => response.json() // if the response is a JSON object
-        ).then(
-            success => console.log(success) // Handle the success response object
-        ).catch(
-            error => console.log(error) // Handle the error response object
-        );
-    };
+            data: JSON.stringify(this.state)
+        });
+    }
 
     render() {
         return (

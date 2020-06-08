@@ -9,6 +9,7 @@ import PngBtn from "../Components/Buttons/PngBtn";
 import EmailBtn from "../Components/Buttons/EmailBtn";
 import DownArrow from "../Components/Buttons/DownArrow";
 import LoadingModelBar from "../Components/LoadingModelBar";
+const axios = require('axios').default;
 
 
 class AddedModel extends Component {
@@ -17,13 +18,14 @@ class AddedModel extends Component {
         super(props)
 
         this.state = {
-            dataProcessed:null,
+            id: this.props.match.params.id,
+            data_processed:null,
 
-            dataId: this.props.match.params.id,
-            dataLabel: null,
-            authorName: null,
-            authorEmail: null,
-            dataDescription: null,
+
+            data_label: null,
+            author_name: null,
+            author_email: null,
+            data_description: null,
             image: null,
 
             tableData: {
@@ -35,49 +37,37 @@ class AddedModel extends Component {
             svgLink: null,
             pngLink: null,
 
-            modelsInfo: [
+            carouselInfo: [
                 {id: null, label: null, author: null, link:"/"}],
         }
-
-        this.getDataForCarousel = this.getDataForCarousel.bind(this)
-        this.getCurrentPageData = this.getCurrentPageData.bind(this)
+        this.getInfoFromServer = this.getInfoFromServer.bind(this)
     };
 
     componentDidMount =  () => {
-        this.getCurrentPageData(this.state.dataId);
-        this.getDataForCarousel(this.state.dataId);
-
+        this.getInfoFromServer(this.state.id)
     }
 
-    getDataForCarousel = (currentDataId) => {
-        this.setState({
-            modelsInfo: [
-                {id: "main", label: "Human RNA", author: "Pustoshilov"},
-                {id: 1, label: "RNA sequence", author: "Vasily"},
-                {id: 2, label: "E-coli RNA", author: "Dimitry"},
-                {id: 3, label: "E-coli DNA", author: "Kristy"},
-                {id: 4, label: "Human DNA", author: "Victor"}]
+    getInfoFromServer = async (id) => {
+        console.log(this.state)
+        const link = "https://europe-west3-webgene.cloudfunctions.net/getUserInfo"
+        let result = await axios({
+            url: link,
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: JSON.stringify({id: id})
         })
+        console.log(result)
+        result = result.data
+        console.log(result)
 
-        return null
-    }
+        await this.setState(result.pageInfo)
+        await this.setState({carouselInfo: result.carouselInfo})
+        console.log(this.state)
 
-    getCurrentPageData = (currentDataId) => {
-
-
-        this.setState( {
-
-            dataLabel: "Something",
-            authorName: "Pustoshilov",
-            authorEmail: "pustoshilov.d@gmail.com",
-            dataDescription: "Even if we, when we were just born, lived already one in the river Upe," +
-                " under the dam, and the other in Gavlovitsy - you know, there, near the wooden bridge.",
-
+        await this.setState( {
             image: plotImage,
-
-            calculatedTime: 20,
-            progress: 30,
-
             tableData: {
                 r0: {c0: "#", c1: "First Name", c2: "Last Name", c3: "Username"},
                 r1: {c0: "1", c1: "Mark", c2: "Thornton", c3: "@mdo"},
@@ -88,12 +78,7 @@ class AddedModel extends Component {
             pngLink: "http://htmlbook.ru/themes/hb/img/logo.png",
         })
 
-        currentDataId === "10"
-            ? this.setState({dataProcessed:false})
-            : this.setState({dataProcessed:true})
-
-
-        return null
+        console.log(this.state)
     }
 
 
@@ -103,23 +88,23 @@ class AddedModel extends Component {
 
         return (
             <div className={"bg-sub"}>
-                {/*<h1>{this.state.dataId}</h1>*/}
+                {/*<h1>{this.state.id}</h1>*/}
                 <Container fluid className={"container-padding-top"}>
                     <Row>
                         <Col sm={6} className={"text-color-sub"}>
                             <p className={"text-header"}>
-                                {this.state.dataLabel}
+                                {this.state.data_label}
                             </p>
                             <p className={"text-main text-color-sub"}>
-                                <b>Author name:</b> {this.state.authorName}
+                                <b>Author name:</b> {this.state.author_name}
                             </p>
                             <p className={"text-main text-color-sub"}>
-                                <b>Author email:</b> {this.state.authorEmail}
+                                <b>Author email:</b> {this.state.author_email}
                             </p>
 
                             <p className={"text-main text-color-sub"}>
                                 <b>Description:</b>
-                                <br/>{this.state.dataDescription}
+                                <br/>{this.state.data_description}
                             </p>
 
                             <TableSample data={this.state.tableData}/>
@@ -127,9 +112,9 @@ class AddedModel extends Component {
 
                         <Col sm={1}/>
                         <Col sm={5}>
-                            {this.state.dataProcessed
+                            {this.state.data_processed
                                 ? <Plot source={this.state.image}/>
-                                : <LoadingModelBar calculatedTime={this.state.calculatedTime} progress={this.state.progress}/>
+                                : <LoadingModelBar calculated_time={this.state.calculated_time} progress={this.state.progress}/>
                             }
 
                         </Col>
@@ -145,7 +130,7 @@ class AddedModel extends Component {
                         </Col>
 
                         <Col sm={1}>
-                            <EmailBtn email={this.state.authorEmail}/>
+                            <EmailBtn email={this.state.author_email}/>
                         </Col>
                     </Row>
                 </Container>
@@ -153,7 +138,7 @@ class AddedModel extends Component {
 
                 <div style={{height:"500px"}} className={"bg-models"}>
                     <DownArrow/>
-                    <ModelsCarousel info={this.state.modelsInfo}/>
+                    <ModelsCarousel info={this.state.carouselInfo}/>
                 </div>
 
             </div>

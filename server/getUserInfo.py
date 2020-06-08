@@ -1,47 +1,71 @@
-def hello_world(request):
-    try:
-        import sqlalchemy
-        # The SQLAlchemy engine will help manage interactions, including automatically
-        # managing a pool of connections to your database
+import sqlalchemy
+
+def getUserInfo(request):
+    #try:
+
+        response = {}
+        id = 0
+
+        request_json = request.get_json()
+        if request.args and 'id' in request.args:
+            id = int(request.args.get('id'))
+        elif request_json and 'id' in request_json:
+            id = int(request_json['id'])
+        else:
+            return "Bad request"
+
         db = sqlalchemy.create_engine(
-        # Equivalent URL:
-        # mysql+pymysql://<db_user>:<db_pass>@/<db_name>?unix_socket=/cloudsql/<cloud_sql_instance_name>
             sqlalchemy.engine.url.URL(
                 drivername='postgres+pg8000',
                 username='postgres',
-                password='Dimkach3',
+                password='12345678',
                 database='users-data',
-                query={'unix_sock': '/cloudsql/{}/.s.PGSQL.5432'.format('webgene:europe-west3:users-data-db')},
+
+                # host="35.198.160.119",
+                # port="5432",
+
+                query={'unix_sock': '/cloudsql/{}/.s.PGSQL.5432'.format('webgene:europe-west3:users-data-db2')},
             ),
-        # ... Specify additional properties here.
-        # ...
-
         )
 
-        stmt = sqlalchemy.text(
-            "SELECT * FROM users_data"
-        )
+        conn = db.connect()
 
-        # Using a with statement ensures that the connection is always released
-        # back into the pool at the end of statement (even if an error occurs)
-        with db.connect() as conn:
-            result = conn.execute(stmt)
-            return str(result[0])
-    except Exception as e:
-        return str(e)
+        sql = "SELECT * FROM users_data WHERE id =%s"
+        proxyResult = conn.execute(sql, str(id))
+        result = [{column: value for column, value in rowproxy.items()} for rowproxy in proxyResult]
 
-    """Responds to any HTTP request.
-    Args:
-        request (flask.Request): HTTP request object.
-    Returns:
-        The response text or any set of values that can be turned into a
-        Response object using
-        `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
-    """
-    #request_json = request.get_json()
-    #if request.args and 'message' in request.args:
-    #    return request.args.get('message')
-    #elif request_json and 'message' in request_json:
-    #    return request_json['message']
-    #else:
-    #    return f'Hello World!'
+        print(result)
+        response.update({"pageInfo": result})
+
+        if id == 0 or id == '0':
+            sql = "select * from users_data " \
+                  "except (select * from users_data where id = %s or id = 0) " \
+                  "order by id desc limit 5;"
+        else:
+            sql = "select * from users_data where id = 0 union all( " \
+                  "select * from users_data " \
+                  "except (select * from users_data where id = %s) " \
+                  "order by id desc) limit 5;"
+
+        proxyResult = conn.execute(sql, str(id))
+        result = [{column: value for column, value in rowproxy.items()} for rowproxy in proxyResult]
+
+        print(result)
+        response.update({"carouselInfo": result})
+
+        print(response)
+        conn.close()
+
+        return str(response)
+
+    #except Exception as e:
+    #    return str(e)
+
+
+if __name__ == '__main__':
+    print(getUserInfo('2'))
+
+
+
+
+
