@@ -3,12 +3,6 @@ import {ProgressBar} from "react-bootstrap";
 
 class LoadingModelBar extends Component {
 
-    constructor(props) {
-        super(props);
-
-
-    }
-
     render() {
 
         return (
@@ -16,7 +10,7 @@ class LoadingModelBar extends Component {
                 <div className={"loading-model-bar"}>
                     <ProgressBar animated now={this.props.progress} />
                     <p className={"text-color-sub text text-main"}>
-                        Results are loading and will be available there in {this.props.calculatedTime} minutes. Update this page after that.
+                        Results are loading and will be available there in {this.props.calculated_time}. Update this page after that.
                     </p>
                 </div>
             </div>

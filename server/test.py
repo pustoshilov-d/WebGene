@@ -1,13 +1,19 @@
+import os
 import json
 import sqlalchemy
 import logging
+import datetime
+import pandas as pd
+from google.cloud import storage
+import re
 
-def getUserInfo(request):
 
+def postUserData(request):
+    info = {}
     print(str(request))
     headers = {
-            'Access-Control-Allow-Origin': '*',
-            "Access-Control-Allow-Methods": "POST, post",
+        'Access-Control-Allow-Origin': '*',
+        "Access-Control-Allow-Methods": "POST, post",
     }
 
     try:
@@ -24,66 +30,142 @@ def getUserInfo(request):
             return ('', 204, headers)
 
         else:
-            response = {}
-            id = 2
+            print(1, info)
 
-            request_json = request.get_json()
-            if request.args and 'id' in request.args:
-                id = int(request.args.get('id'))
-            elif request_json and 'id' in request_json:
-                id = int(request_json['id'])
-            else:
-                print(request_json)
-                return (str(request), 402, headers)
+            try:
+                print('есть формы: ')
+                for item in request.form.lists():
+                    print(item[0], ' --> ', item[1])
 
-            db = sqlalchemy.create_engine(
-                sqlalchemy.engine.url.URL(
-                    drivername='postgres+pg8000',
-                    username='postgres',
-                    password='12345678',
-                    database='users-data',
+                print('есть файлы: ')
+                for item in request.files.lists():
+                    print(item[0], ' --> ', item[1])
 
-                    # host="35.198.160.119",
-                    # port="5432",
+                print('есть арги: ')
+                for item in request.args.lists():
+                    print(item[0], ' --> ', item[1], )
 
-                    query={'unix_sock': '/cloudsql/{}/.s.PGSQL.5432'.format('webgene:europe-west3:users-data-db2')},
-                ),
-            )
+                print('есть json: ', request.json)
+            except Exception as e:
+                print('реквест не парсится', e)
+
+            # заполнение данными из реквеста
+            info = request.form.to_dict(flat=True)
+            info.update({'data_file': request.files['data_file']})
+            print(2, info)
+
+            # заполнение отсутсвующих данных
+            if 'author_name' not in info: info.update({'author_name': "null"})
+            if 'author_email' not in info: info.update({'author_email': "null"})
+            if 'data_label' not in info: info.update({'data_label': "null"})
+            if 'data_description' not in info: info.update({'data_description': "null"})
+            if 'terms_acceptation' not in info: info.update({'terms_acceptation': "false"})
+            if 'data_length' not in info: info.update({'data_length': 0})
+            if 'date_adding' not in info: info.update({'date_adding': "null"})
+            if 'author_name' not in info: info.update({'author_name': "null"})
+
+            print(3, info)
+
+            # проверить файл
+            print(type(info['data_file_name']), info['data_file_name'])
+            print(re.findall('\w+', info['data_file_name']))
+            info.update({'data_file_type_short': re.findall('\w+', info['data_file_name'])[-1]})
+            print(3.5, info)
+            try:
+                if info['data_file_type_short'] in ('xls', 'xlsx'):
+                    print('excel')
+                    df = pd.read_excel(info['data_file'])
+                elif info['data_file_type_short'] == 'csv':
+                    print('csv')
+                    df = pd.read_csv(info['data_file'])
+                else:
+                    print('other format')
+                    df = pd.read_table(info['data_file'])
+                print("Всё ок", df.head())
+            except Exception as e:
+                print('Файл не оч', e)
+                return (json.dumps({"error": str(e), "error_my": "Wrong data format"}), 410, headers)
+
+            info['data_length'] = len(df)
+
+            # проверить столбцы файла
+            # if df.columns != ['', '','']:
+            #     return (json.dumps({"error": str(e), "error_my":"Wrong columns"}), 411, headers)
+            info.update({"data_sample": df.head(3)})
+            print(4, info)
+
+            # загрузить инфу в базу   # взять оттуда id
+            print(4.2)
+            full_name = os.environ.get('DB_FULL_NAME')
+            port = os.environ.get('DB_PORT')
+            print(4.3)
+            print(full_name, port)
+
+            db_url = sqlalchemy.engine.url.URL(
+                drivername='postgres+pg8000',
+                username=os.environ.get('DB_USERNAME'),
+                password=os.environ.get('DB_PASSWORD'),
+                database=os.environ.get('DB_DATABASE'),
+                # port=os.environ.get('DB_PORT'),
+                # host=os.environ.get('DB_HOST'),
+                query={'unix_sock': f"/cloudsql/{full_name}/.s.PGSQL.{port}"})
+            db = sqlalchemy.create_engine(db_url, )
+            print(db_url, db)
+
+            sql = "INSERT INTO users_data(" \
+                  "author_name, author_email, " \
+                  "data_label, data_description, terms_acceptation, " \
+                  "data_length, date_adding, " \
+                  "calculated_time, progress,	data_processed) " \
+                  "VALUES (\'{0}\', \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\', " \
+                  "\'{6}\', \'{7}\', {8}, {9})"
+
+            sql2 = "select create_data_sample_table()"
+
+            ###добавить data_sample insert самостоятельный
+            ###добавить data_path
+
+            sql = sql.format(
+                info['author_name'], info['author_email'],
+                info['data_label'], info['data_description'], info['terms_acceptation'],
+                info['data_length'], datetime.datetime.now(),
+                '1 hour', 10, "false")
+
+            print(sql)
+            print(sql2)
+            print(5, info)
 
             conn = db.connect()
-
-            sql = "SELECT * FROM users_data WHERE id =%s"
-            proxyResult = conn.execute(sql, str(id))
-            result = [{column: value for column, value in rowproxy.items()} for rowproxy in proxyResult]
-
-            response.update({"pageInfo": result})
-
-            if id == 0 or id == '0':
-                sql = "select * from users_data " \
-                    "except (select * from users_data where id = %s or id = 0) " \
-                    "order by id desc limit 5;"
-            else:
-                sql = "select * from users_data where id = 0 union all( " \
-                    "select * from users_data " \
-                    "except (select * from users_data where id = %s) " \
-                    "order by id desc) limit 5;"
-
-            proxyResult = conn.execute(sql, str(id))
-            result = [{column: value for column, value in rowProxy.items()} for rowProxy in proxyResult]
-
-            response.update({"carouselInfo": result})
-
+            proxyResult = conn.execute(sql)
             conn.close()
 
-            logging.info(response)
-            print(response)
+            print(5.5)
+            conn = db.connect()
+            proxyResult = conn.execute(sql2)
+            result = [{column: value for column, value in rowproxy.items()} for rowproxy in proxyResult]
+            conn.close()
+            print(result)
+            info.update({"id": result[0]['create_data_sample_table']})
 
-            return (json.dumps(response), 200, headers)
+            print(6, info)
 
+            if 'data_file_name_storage' not in info: info.update({
+                "data_file_name_storage": str(info['id']) + "_train_data." + info['data_file_type_short']})
+            if 'data_path' not in info:
+                info.update({'data_path': 'for_postUserData/' + info['data_file_name_storage']})
 
+            storage_client = storage.Client()
+            bucket = storage_client.bucket(os.environ.get('BUCKET_NAME', 'None'))
+            blob = bucket.blob(info['data_path'])
+            info['data_file'].seek(0)
+            blob.upload_from_file(info['data_file'])
 
+            # запустить обучение
+            # startTraining(info['file_path'])
+
+            print(10, info)
+            return (json.dumps(info['id']), 200, headers)
 
     except Exception as e:
-        logging.info(e)
         print(e)
-        return (str(e), 410, headers)
+        return (json.dumps({"error": str(e)}), 410, headers)

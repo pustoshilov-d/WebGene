@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import icon from "../../images/Buttons/EmailButton.png";
 import iconActive from "../../images/Buttons/Email-Active.png";
-import {Link} from "react-router-dom";
 
 class EmailBtn extends Component {
 

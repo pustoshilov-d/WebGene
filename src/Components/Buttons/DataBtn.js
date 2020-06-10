@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import imageButton from "../../images/Buttons/AddButton.png";
 
 class DataBtn extends Component {
 

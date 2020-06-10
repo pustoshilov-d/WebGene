@@ -1,5 +1,5 @@
 runtime: nodejs
-env: flex
+env: standart
 
 handlers:
   - url: /static/js/(.*)
@@ -23,8 +23,7 @@ handlers:
 
 automatic_scaling:
   min_num_instances: 1
-  max_num_instances: 10
-  cool_down_period_sec: 180
+  max_num_instances: 2
   cpu_utilization:
     target_utilization: 0.9
 
@@ -32,7 +31,7 @@ network:
   name: default
 
 resources:
-  cpu: 2
-  memory_gb: 4.6
+  cpu: 1
+  memory_gb: 2
   disk_size_gb: 10
 

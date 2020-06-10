@@ -9,15 +9,20 @@ import PngBtn from "../Components/Buttons/PngBtn";
 import EmailBtn from "../Components/Buttons/EmailBtn";
 import DownArrow from "../Components/Buttons/DownArrow";
 import LoadingModelBar from "../Components/LoadingModelBar";
+
 const axios = require('axios').default;
 
-class MainModel extends Component {
+
+class AddedModel extends Component {
 
     constructor(props) {
         super(props)
 
         this.state = {
             id: 0,
+            data_processed:null,
+
+
             data_label: null,
             author_name: null,
             author_email: null,
@@ -36,53 +41,55 @@ class MainModel extends Component {
             carouselInfo: [
                 {id: null, label: null, author: null, link:"/"}],
         }
-
         this.getInfoFromServer = this.getInfoFromServer.bind(this)
-   };
+    };
 
     componentDidMount =  () => {
         this.getInfoFromServer(this.state.id)
     }
 
-     getInfoFromServer = async (id) => {
-         console.log(this.state)
-         const link = "https://europe-west3-webgene.cloudfunctions.net/getUserInfo"
-         let result = await axios({
-             url: link,
-             method: 'post',
-             headers: {
-                 'Content-Type': 'application/json',
-             },
-             data: JSON.stringify({id: id})
-         })
-         console.log(result)
-         result = result.data
-         console.log(result)
+    getInfoFromServer = async (id) => {
+        console.log(this.state)
+        const link = "https://europe-west3-webgene.cloudfunctions.net/getUserInfo"
+        let result = await axios({
+            url: link,
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: JSON.stringify({id: id})
+        })
+        console.log(result)
+        result = result.data
+        console.log(result)
 
-         await this.setState(result.pageInfo)
-         await this.setState({carouselInfo: result.carouselInfo})
-         console.log(this.state)
+        await this.setState(result.pageInfo)
+        await this.setState({carouselInfo: result.carouselInfo})
+        console.log(this.state)
 
-         await this.setState( {
-             image: plotImage,
-             tableData: {
-                 r0: {c0: "#", c1: "First Name", c2: "Last Name", c3: "Username"},
-                 r1: {c0: "1", c1: "Mark", c2: "Thornton", c3: "@mdo"},
-                 r2: {c0: "2", c1: "Jacob", c2: "Otto", c3: "@fat"},
-                 r3: {c0: "3", c1: "Larry", c2: "the Bird", c3: "@twitter"},
-             },
-             svgLink: "http://htmlbook.ru/themes/hb/img/logo.png",
-             pngLink: "http://htmlbook.ru/themes/hb/img/logo.png",
-         })
+        await this.setState( {
+            image: plotImage,
+            tableData: {
+                r0: {c0: "#", c1: "First Name", c2: "Last Name", c3: "Username"},
+                r1: {c0: "1", c1: "Mark", c2: "Thornton", c3: "@mdo"},
+                r2: {c0: "2", c1: "Jacob", c2: "Otto", c3: "@fat"},
+                r3: {c0: "3", c1: "Larry", c2: "the Bird", c3: "@twitter"},
+            },
+            svgLink: "http://htmlbook.ru/themes/hb/img/logo.png",
+            pngLink: "http://htmlbook.ru/themes/hb/img/logo.png",
+        })
 
-         console.log(this.state)
-     }
+        console.log(this.state)
+    }
 
 
 
     render() {
+        console.log(this.state)
+
         return (
             <div className={"bg-sub"}>
+                {/*<h1>{this.state.id}</h1>*/}
                 <Container fluid className={"container-padding-top"}>
                     <Row>
                         <Col sm={6} className={"text-color-sub"}>
@@ -110,16 +117,17 @@ class MainModel extends Component {
                                 ? <Plot source={this.state.image}/>
                                 : <LoadingModelBar calculated_time={this.state.calculated_time} progress={this.state.progress}/>
                             }
+
                         </Col>
                     </Row>
 
                     <Row>
                         <Col sm={8}/>
                         <Col sm={1}>
-                            <SvgBtn link={this.state.svgLink}/>
+                            {this.state.data_processed &&  <SvgBtn link={this.state.svgLink}/>}
                         </Col>
                         <Col sm={1}>
-                            <PngBtn link={this.state.pngLink}/>
+                            {this.state.data_processed &&  <PngBtn link={this.state.pngLink}/>}
                         </Col>
 
                         <Col sm={1}>
@@ -134,11 +142,9 @@ class MainModel extends Component {
                     <ModelsCarousel info={this.state.carouselInfo}/>
                 </div>
 
-
-
             </div>
         );
     }
 }
 
-export default MainModel;
+export default AddedModel;

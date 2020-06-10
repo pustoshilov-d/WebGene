@@ -1,13 +1,11 @@
 import React, {Component} from 'react';
-import { TransitionGroup, CSSTransition } from "react-transition-group";
+import {CSSTransition, TransitionGroup} from "react-transition-group";
 import {Col, Container, Row} from "react-bootstrap";
 import mineImage from "../images/Mine.png";
 import dnaImage from "../images/RNA3.png";
 import EmailBtn from "../Components/Buttons/EmailBtn";
 import GitBtn from "../Components/Buttons/GitBtn";
 import GoBtn from "../Components/Buttons/GoBtn";
-import iconActive from "../images/Buttons/Add-Active.png";
-import icon from "../images/Buttons/AddButton.png";
 
 class Home extends Component {
 

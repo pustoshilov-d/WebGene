@@ -9,6 +9,7 @@ import PngBtn from "../Components/Buttons/PngBtn";
 import EmailBtn from "../Components/Buttons/EmailBtn";
 import DownArrow from "../Components/Buttons/DownArrow";
 import LoadingModelBar from "../Components/LoadingModelBar";
+
 const axios = require('axios').default;
 
 
@@ -123,10 +124,10 @@ class AddedModel extends Component {
                     <Row>
                         <Col sm={8}/>
                         <Col sm={1}>
-                            <SvgBtn link={this.state.svgLink}/>
+                            {this.state.data_processed &&  <SvgBtn link={this.state.svgLink}/>}
                         </Col>
                         <Col sm={1}>
-                            <PngBtn link={this.state.pngLink}/>
+                            {this.state.data_processed &&  <PngBtn link={this.state.pngLink}/>}
                         </Col>
 
                         <Col sm={1}>

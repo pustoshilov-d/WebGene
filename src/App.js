@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Animations.css';
@@ -18,9 +18,37 @@ import {Sticky, StickyContainer} from "react-sticky";
 import MainModel from "./Pages/MainModel";
 import Testing from "./Pages/Testing";
 
+// onLoad={e => (e.currentTarget.className += ' fadein-on')
+
 function App() {
+
+    const [loaded, setLoaded] = useState(false)
+
+    useEffect(() => {
+        if  (!loaded){
+            setTimeout(() =>
+                document.getElementById('header').className += ' fadein-on',
+                1000)
+
+            setTimeout(() =>
+                    document.getElementById('description').className += ' fadein-on',
+                3000)
+
+            setTimeout(() =>
+                    document.getElementById('blocks').className += ' fadein-on',
+                5000)
+
+            setTimeout(() =>
+                    document.getElementById('footer').className += ' fadein-on',
+                4500)
+
+            setLoaded(true)
+        }
+    }, [loaded])
+
+
   return (
-    <div className={"App"}>
+    <div className={"App bg-main"}>
       <Router>
         <div>
           <Switch>
@@ -89,14 +117,20 @@ function App() {
               <Route path={"/"}>
                   <StickyContainer>
                       <Sticky>{({ style }) =>(
-                          <header style={style}>
+                          <header style={style} className={'header-fadein' } id={'header'}>
                               <HomeHeader/>
                           </header>)}
                       </Sticky>
-                      <Description/>
-                      <Home/>
+                      <div className={'description-fadein'} id={'description'}>
+                        <Description/>
+                      </div>
+                      <div className={'blocks-fadein'} id={'blocks'}>
+                        <Home/>
+                      </div>
                   </StickyContainer>
-                  <Footer/>
+                  <div className={'footer-fadein'} id={'footer'}>
+                    <Footer/>
+                  </div>
               </Route>
           </Switch>
         </div>

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Button, Col, Container, Form, InputGroup, Row} from "react-bootstrap";
 import UploadBtn from "../Components/Buttons/UploadBtn";
 import {withRouter} from 'react-router-dom';
+
 const axios = require('axios').default;
 
 
@@ -11,10 +12,10 @@ class Loading extends Component {
         super(props)
 
         this.state = {
-            data_label:null,
-            data_description:null,
-            author_name:null,
-            author_email:null,
+            data_label:'',
+            data_description:'',
+            author_name:'',
+            author_email:'',
             data_file:null,
             terms_acceptation: false,
         }
@@ -25,38 +26,52 @@ class Loading extends Component {
 
 
     handleSubmit = async (event) => {
+        // event.persist();
         const form = event.currentTarget;
         event.preventDefault();
+
         console.log(event)
         console.log(form.elements)
 
         await this.setState({
-            data_label:form.elements["validationLabel"].value,
-            data_description:form.elements["validationDescription"].value,
-            author_name:form.elements["validationUsername"].value,
-            author_email:form.elements["validationEmail"].value,
-            data_file:form.elements["formcheck-api-regular"].files[0],
+            data_label:form.elements["data_label"].value,
+            data_description:form.elements["data_description"].value,
+            author_name:form.elements["author_name"].value,
+            author_email:form.elements["author_email"].value,
+            data_file:form.elements["data_file"].files[0],
+            data_file_type:form.elements["data_file"].files[0].type,
+            data_file_name:form.elements["data_file"].files[0].name,
+            terms_acceptation: form.elements["terms_acceptation"].checked
         })
-        form.elements["validationTerms"].value === "on" ?
-            await this.setState({terms_acceptation: true}) :
-            await this.setState({terms_acceptation: false})
+
         
-        console.log(this.state);
-        let result = await this.upload()
+        const formData = new FormData();
+        formData.append('data_label',form.elements["data_label"].value);
+        formData.append('data_description',form.elements["data_description"].value);
+        formData.append('author_name',form.elements["author_name"].value);
+        formData.append('author_email',form.elements["author_email"].value);
+        formData.append('data_file',form.elements["data_file"].files[0]);
+        formData.append('data_file_type',form.elements["data_file"].files[0].type);
+        formData.append('data_file_name',form.elements["data_file"].files[0].name);
+        formData.append('terms_acceptation', form.elements["terms_acceptation"].checked);
+        
+        // formData.append("info", this.state);
+        console.log(...formData);
+
+
+        let result = await this.upload(formData)
         console.log(result)
-        // this.props.history.push("/models/"+result.data.id.toString())
+        this.props.history.push("/models/"+result.toString())
     }
 
-    upload = async (id) => {
+    upload = async (formData) => {
         const link = "https://europe-west3-webgene.cloudfunctions.net/postUserData"
-        return axios({
+        let result = await axios({
             url: link,
             method: 'post',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            data: JSON.stringify(this.state)
+            data: formData
         });
+        return result.data
     }
 
     render() {
@@ -70,29 +85,29 @@ class Loading extends Component {
                     >
                         <Row>
                             <Col sm={5}>
-                                <Form.Group id={"labelField"} controlId="validationLabel">
+                                <Form.Group id={""} controlId="data_label">
                                     <Form.Label className={"text-small-bold"}>Label of data</Form.Label>
                                     <Form.Control
-                                        // required
+                                        required
                                         type="text"
                                     />
                                     <Form.Text>Less than 10 characters</Form.Text>
                                 </Form.Group>
 
-                                <Form.Group  controlId="validationDescription">
+                                <Form.Group  controlId="data_description">
                                     <Form.Label className={"text-small-bold"}>Describe your data</Form.Label>
                                     <Form.Control
                                         as={"textarea"}
                                         rows={"3"}
-                                        // required
+                                        required
                                         type="text"
                                     />
                                     <Form.Text>Less than 200 characters</Form.Text>
                                 </Form.Group>
 
-                                <Form.Group controlId="validationTerms">
+                                <Form.Group controlId="terms_acceptation">
                                     <Form.Check
-                                        // required
+                                        required
                                         label="Agree to terms and conditions"
                                     />
                                 </Form.Group>
@@ -102,7 +117,7 @@ class Loading extends Component {
 
                             <Col sm={5}>
 
-                                    <Form.Group controlId="validationUsername">
+                                    <Form.Group controlId="author_name">
                                         <Form.Label className={"text-small-bold"}>Username</Form.Label>
                                         <InputGroup>
                                             <InputGroup.Prepend>
@@ -111,17 +126,17 @@ class Loading extends Component {
                                             <Form.Control
                                                 type="text"
                                                 aria-describedby="inputGroupPrepend"
-                                                // required
+                                                required
                                             />
                                         </InputGroup>
                                         <Form.Text>One word, less than 10 characters</Form.Text>
                                     </Form.Group>
 
-                                    <Form.Group controlId={"validationEmail"}>
+                                    <Form.Group controlId={"author_email"}>
                                         <Form.Label className={"text-small-bold"}>Email address</Form.Label>
                                         <Form.Control
                                             type={"email"}
-                                            // required
+                                            required
                                         />
                                         <Form.Text>
                                             Email is the main way for people to communicate with you about your data
@@ -129,10 +144,10 @@ class Loading extends Component {
                                     </Form.Group>
 
 
-                                    <Form.Group controlId="validationFile">
-                                        <Form.File  id="formcheck-api-regular">
+                                    <Form.Group controlId="file_form">
+                                        <Form.File  id="data_file">
                                             <Form.File.Input
-                                                // required
+                                                required
                                                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                             />
                                         </Form.File>

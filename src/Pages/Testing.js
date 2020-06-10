@@ -1,5 +1,5 @@
 import React from "react";
-import { TransitionGroup, CSSTransition } from "react-transition-group";
+import {CSSTransition, TransitionGroup} from "react-transition-group";
 import {Button} from "react-bootstrap";
 
 class Testing extends React.Component {
